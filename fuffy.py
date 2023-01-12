@@ -3,16 +3,22 @@ import pyfiglet
 import argparse
 from time import sleep
 from bs4 import BeautifulSoup
+import sys
 
 
 parse = argparse.ArgumentParser()
 
-parse.add_argument('-u', '--url', required=True, help='URL TARGET: https:exemple.com.br/FUZZ')
-parse.add_argument('-X', '--method', required=False, help='HTTP METHOD. defalt: GET')
-parse.add_argument('-hc', '--header_code', required=False, help='Response status-code')
-parse.add_argument('-mr', '--reader', required=False, help='Search for word in response')
-parse.add_argument('-x', '--extension', required=False)
+parse.add_argument('-u', '--url', required=True,
+                   help='URL TARGET: https:exemple.com.br/FUZZ')
+parse.add_argument('-X', '--method', required=False,
+                   help='HTTP METHOD. defalt: GET')
+parse.add_argument('-hc', '--header_code', required=False,
+                   help='Response status-code')
+parse.add_argument('-mr', '--reader', required=False,
+                   help='Search for word in response')
+parse.add_argument('-e', '--extension', required=False)
 parse.add_argument('-w', '--wordlist', required=False)
+parse.add_argument('-c', '--cookie', required=False)
 
 args = parse.parse_args()
 
@@ -21,7 +27,7 @@ def app_banner(url, extension, method, payload, status_code=200):
     banner = pyfiglet.Figlet(font='slant')
 
     print(banner.renderText('   Fuffy'))
-    print('v0.2 Made By AZ4R')
+    print('v0.2 -------Made By AZ4R')
     print('-' * 50, '\n')
     sleep(1)
     print(':: Method:       :', str(method))
@@ -40,6 +46,8 @@ def request_allow_method():
     allow_methods = ['GET', 'POST', 'OPTIONS',
                      'TRACE', 'HEAD', 'PUT', 'DELETE']
     error = f'\n:: Method {HTTP_METHOD} Not-Allowed or Not Exist\n'
+    if HTTP_METHOD == 'None':
+        return
     for method in allow_methods:
         if HTTP_METHOD == method:
             return method
@@ -86,6 +94,29 @@ def header_content_reader(request, reader, conter, line, index):
         print(f' :------------: {index}\r', end='\n')
 
 
+def payload_check(payload):
+    if payload == None:
+        print('[+] Wordlist is Missing!')
+        exit(1)
+
+
+def extension_check(extension):
+    extension = extension if extension != None else '----'
+    return extension
+
+
+def method_check(http_method):
+    if http_method == None:
+        http_method = 'GET'
+    return http_method
+
+
+def status_code_check(http_content, status_code):
+    if http_content == None:
+        status_code = [200, 301, 404, 403, 500] if status_code == None else status_code
+    return status_code
+
+
 def request_fuzzing():
     url = str(args.url)
     method = request_allow_method()
@@ -93,16 +124,12 @@ def request_fuzzing():
     content_reader = args.reader
     extension = args.extension
     payload = args.wordlist
+    cookie = args.cookie
 
-    if payload == None:
-        print('[+] Wordlist is Missing!')
-    if extension != None:
-        url += extension
-    if method == None:
-        method = 'GET'
-    if content_reader == None:
-        if status_code == None:
-            status_code = [200, 301, 404, 500]
+    payload_check(payload)
+    method = method_check(method)
+    extension = extension_check(extension)
+    status_code = status_code_check(content_reader, status_code)
 
     app_banner(url, extension, method, payload, status_code)
 
@@ -118,15 +145,15 @@ def request_fuzzing():
         conter = 0
     for index in line:
         try:
-            request = requests.request(
-                method, url_format(url, index), timeout=10)
+            request = requests.request(method, url_format(
+                url, index), timeout=10, data=cookie)
         except KeyboardInterrupt:
             stop_app()
         if status_code != None:
             header_code_request(request, status_code, conter, line, index)
         if content_reader != None:
             header_content_reader(request, content_reader, conter, line, index)
-        print(f'\rProgress: [{conter}: {len(line)}]', end='')
+        print(f'\rProgress: [{conter}: {len(line)}]', sep='', end='', flush=True)
         conter += 1
 
 
