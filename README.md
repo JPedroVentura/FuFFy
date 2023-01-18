@@ -1,4 +1,8 @@
 ﻿# FuFFy
+ 
+:warning: [+] Aviso: Este é um software de teste de vulnerabilidade baseado em difusos, não o use sem permissão prévia, pois esta é uma ação ilegal.
+    Use somente em ambientes autorizados e que tenham controle total, não sou responsável pelo uso indevido do aplicativo. :warning:
+    
 Fuffy é uma ferramenta para pentest e bug-bounty voltada para a realização de Fuzzing
 
 Mas o que é *Fuzzing*?
