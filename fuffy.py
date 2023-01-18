@@ -3,7 +3,6 @@ import pyfiglet
 import argparse
 from time import sleep
 from bs4 import BeautifulSoup
-import sys
 
 
 parse = argparse.ArgumentParser()
@@ -18,7 +17,7 @@ parse.add_argument('-mr', '--reader', required=False,
                    help='Search for word in response')
 parse.add_argument('-e', '--extension', required=False)
 parse.add_argument('-w', '--wordlist', required=False)
-parse.add_argument('-c', '--cookie', required=False)
+parse.add_argument('-d', '--data', help='Request content body')
 
 args = parse.parse_args()
 
@@ -113,8 +112,15 @@ def method_check(http_method):
 
 def status_code_check(http_content, status_code):
     if http_content == None:
-        status_code = [200, 301, 404, 403, 500] if status_code == None else status_code
+        status_code = [200, 301, 404, 403,
+                       500] if status_code == None else status_code
     return status_code
+
+
+def data_header(http_data):
+    data = http_data.split(':')
+
+    return {data[0]: data[1]}
 
 
 def request_fuzzing():
@@ -124,7 +130,7 @@ def request_fuzzing():
     content_reader = args.reader
     extension = args.extension
     payload = args.wordlist
-    cookie = args.cookie
+    data = args.data
 
     payload_check(payload)
     method = method_check(method)
@@ -136,8 +142,8 @@ def request_fuzzing():
     if not url_check(url):
         return
 
-    if 'FUZZ' not in url:
-        print(':: Missing FUZZ in url target')
+    if 'FUZZ' not in url and 'FUZZ' not in data:
+        print(':: Missing FUZZ in target')
         return
 
     with open(payload) as file:
@@ -146,14 +152,15 @@ def request_fuzzing():
     for index in line:
         try:
             request = requests.request(method, url_format(
-                url, index), timeout=10, data=cookie)
+                url, index), timeout=10, data=data_header(data))
         except KeyboardInterrupt:
             stop_app()
         if status_code != None:
             header_code_request(request, status_code, conter, line, index)
         if content_reader != None:
             header_content_reader(request, content_reader, conter, line, index)
-        print(f'\rProgress: [{conter}: {len(line)}]', sep='', end='', flush=True)
+        print(f'\rProgress: [{conter}: {len(line)}]',
+              sep='', end='', flush=True)
         conter += 1
 
 
