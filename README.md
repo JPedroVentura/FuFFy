@@ -11,6 +11,4 @@ Fuzzing nada mais é do que uma técnica de teste automatizado / semi-automatiza
 
 ![image](https://user-images.githubusercontent.com/86115368/213193705-93165e4f-401a-4458-b0fd-a90be0dd1136.png)
 
-<button onclick="sayHello()">
-  Say Hello
-<button>
+<a href="#" onclick={prompt(1)}>
