@@ -11,4 +11,4 @@ Fuzzing nada mais é do que uma técnica de teste automatizado / semi-automatiza
 
 ![image](https://user-images.githubusercontent.com/86115368/213193705-93165e4f-401a-4458-b0fd-a90be0dd1136.png)
 
-![happy-1-svgrepo-com](https://user-images.githubusercontent.com/86115368/213706177-811cc7f5-85c5-4097-b01b-398dd614a7d3.svg)
+<a href="#">Click Aqui</a>
